@@ -1,5 +1,6 @@
 const Hapi = require('@hapi/hapi');
-const routes = require('./routes');
+const notes = require('./api/notes');
+const NotesService = require('./services/inMemory/NotesService');
 
 const init = async () => {
   const server = Hapi.server({
@@ -12,7 +13,14 @@ const init = async () => {
     },
   });
 
-  server.route(routes);
+  const notesService = new NotesService();
+
+  await server.register({
+    plugin: notes,
+    options: {
+      service: notesService,
+    },
+  });
 
   await server.start();
   console.log(`Server running on ${server.info.uri}`);
